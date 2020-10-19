@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 from Utilities import data_preparation
 from sklearn.manifold import TSNE
 import plotly.offline as py
-import plotly.graph_objs as go
+import plotly.express as px
 
 class_names = ['T-shirt', 'Trouser', 'Pullover', 'Dress', 'Coat',
                'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
+
 
 # Plots a single image
 def sample_plot(img_train, img_label, size):
@@ -21,6 +22,7 @@ def sample_plot(img_train, img_label, size):
         plt.imshow(img_train[i], cmap=plt.cm.binary)
         plt.xlabel(class_names[img_label[i]])
     plt.show()
+
 
 # Plots the predicted results for 'i' items
 def plot_image(i, predictions_array, true_label, img):
@@ -83,6 +85,7 @@ def plot_history(history, model_name):
     plt.gca().set_ylim(0, 1)  # set the vertical range to [0-1]
     plt.show()
 
+
 # Create an interactive scatter plot with Plotly and T-SNE
 def plot_scatter():
     label_dict = {0: 'T-shirt', 1: 'Trouser', 2: 'Pullover',
@@ -94,7 +97,7 @@ def plot_scatter():
 
     x_train, y_train, x_test, y_test, x_valid, y_valid = data_preparation()
 
-    # Choose 1000 items of the total
+    # Choose a sample from the total dataset
     X = x_test[:1000]
     Target = y_test[:1000]
     images = X.reshape(X.shape[0], 28 * 28)
@@ -104,27 +107,6 @@ def plot_scatter():
     tsne = TSNE(n_components=2)
     tsne_results = tsne.fit_transform(images)
 
-    traceTSNE = go.Scatter(
-        x=tsne_results[:, 0],
-        y=tsne_results[:, 1],
-        text=labels,
-        mode='markers',
-        showlegend=True,
-        marker=dict(
-            size=8,
-            color=Target,
-            colorscale='thermal',
-            showscale=False,
-            line=dict(
-                width=2,
-                color='rgb(255, 255, 255)'),
-            opacity=1
-        )
-    )
-    layout = dict(title='TSNE : Fashion MNIST',
-                  hovermode='closest',
-                  yaxis=dict(zeroline=False),
-                  xaxis=dict(zeroline=False),
-                  showlegend=False)
-    fig = dict(data=[traceTSNE], layout=layout)
-    py.plot(fig, filename='scatter')
+    fig = px.scatter(x=tsne_results[:, 0], y=tsne_results[:, 1], color=labels,
+                     color_discrete_sequence=px.colors.qualitative.Prism)
+    py.plot(fig, filename='scatter_3000')
